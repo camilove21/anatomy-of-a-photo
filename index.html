@@ -1,0 +1,55 @@
+!DOCTYPE html
+html lang=es
+head
+  meta charset=UTF-8
+  titleAnatomía de una Fototitle
+  script src=httpscdn.jsdelivr.netnpmexif-jsscript
+  style
+    body { font-family Arial; padding 20px; background-color #f5f5f5; }
+    h1 { color #333; }
+    input[type=file] { margin-bottom 20px; }
+    .resultado { margin-top 20px; }
+  style
+head
+body
+  h1🧬 Anatomía de una Fotoh1
+  pSube una foto y descubre su lugar de origen (si tiene GPS).p
+  input type=file id=inputImage accept=imagejpeg
+  div class=resultado id=outputdiv
+
+  script
+    function convertToDecimal(coord, ref) {
+      const decimal = coord[0] + coord[1]  60 + coord[2]  3600;
+      return (ref === 'S'  ref === 'W')  -decimal  decimal;
+    }
+
+    document.getElementById('inputImage').addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (file) {
+        EXIF.getData(file, function () {
+          const lat = EXIF.getTag(this, 'GPSLatitude');
+          const lon = EXIF.getTag(this, 'GPSLongitude');
+          const latRef = EXIF.getTag(this, 'GPSLatitudeRef');
+          const lonRef = EXIF.getTag(this, 'GPSLongitudeRef');
+
+          const output = document.getElementById('output');
+
+          if (lat && lon) {
+            const latitude = convertToDecimal(lat, latRef);
+            const longitude = convertToDecimal(lon, lonRef);
+            const link = `httpswww.google.commapsq=${latitude},${longitude}`;
+            output.innerHTML = `
+              strongCoordenadas encontradasstrongbr
+              Latitud ${latitude} br
+              Longitud ${longitude} br
+              a href=${link} target=_blank🌍 Ver en Google Mapsa
+            `;
+          } else {
+            output.innerHTML = '❌ Esta foto no contiene coordenadas GPS en sus metadatos.';
+          }
+        });
+      }
+    });
+  script
+body
+html
